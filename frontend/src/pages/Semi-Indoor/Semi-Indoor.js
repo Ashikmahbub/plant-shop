@@ -5,7 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
-const API_URL = 'https://plants-shop-server-rho.vercel.app/api/';
+const API_URL = 'http://plants-shop.duckdns.org/api/';
 const IMG_URL = 'http://localhost:5000';
 
 const SemiIndoorPlants = () => {

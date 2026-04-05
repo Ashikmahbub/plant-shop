@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ClipLoader from 'react-spinners/ClipLoader';
 
-const API_URL = 'https://plants-shop-server-rho.vercel.app/api/';
+const API_URL = 'http://plants-shop.duckdns.org/api/';
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);

@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { Rings } from 'react-loader-spinner';
 import 'react-toastify/dist/ReactToastify.css';
 
-const API_URL = 'https://plants-shop-server-rho.vercel.app/api/';
+const API_URL = 'http://plants-shop.duckdns.org/api/';
 
 const OrderEdit = () => {
   const { orderId } = useParams();

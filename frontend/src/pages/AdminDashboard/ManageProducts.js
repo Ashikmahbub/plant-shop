@@ -4,7 +4,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AddProduct from './AddProduct';
 
-const API_URL = 'https://plants-shop-server-rho.vercel.app/api/';
+const API_URL = 'http://plants-shop.duckdns.org/api/';
 const rootUrl = 'http://localhost:5000';
 
 const ManageProducts = () => {
