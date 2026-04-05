@@ -1,0 +1,33 @@
+name: Deploy Plants Shop
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Pull latest code
+        run: |
+          cd /var/www/plants-shop
+          git pull origin master
+
+      - name: Create backend .env
+        run: |
+          cat > /var/www/plants-shop/backend/.env <<EOF
+          MONGODB_URI=${{ secrets.MONGODB_URI }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
+          PORT=5000
+          EOF
+
+      - name: Build and restart containers
+        run: |
+          cd /var/www/plants-shop
+          docker compose up -d --build
+
+      - name: Clean up old images
+        run: docker image prune -f

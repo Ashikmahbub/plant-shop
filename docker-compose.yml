@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  plants-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: plants_backend
+    restart: always
+    ports:
+      - "5001:5000"
+    env_file:
+      - ./backend/.env
+
+  plants-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: plants_frontend
+    restart: always
+    ports:
+      - "3001:80"
+    depends_on:
+      - plants-backend
