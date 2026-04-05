@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 
 const API_URL = 'http://plants-shop.duckdns.org/api/'
-const IMG_URL = 'https://plants-shop-server-rho.vercel.app/';
+const IMG_URL = process.env.REACT_APP_IMG_URL;
 
 const Indoor = () => {
   const { addToCart} = useCart(); 
