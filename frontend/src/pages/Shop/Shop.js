@@ -5,6 +5,13 @@ import { useCart } from '../../context/CartContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+
+
+
+
+ 
+const IMG_URL = process.env.REACT_APP_IMG_URL;
+
 const Shop = () => {
   const { addToCart} = useCart(); 
  
@@ -119,7 +126,11 @@ const Shop = () => {
             className="border border-gray-200 rounded-lg overflow-hidden shadow-sm"
           >
             <img
-              src={`https://plants-shop-server-rho.vercel.app/${product.imageUrl}`}
+               src={
+                    product.imageUrl?.startsWith("http")
+                      ? product.imageUrl
+                      : `${IMG_URL}${product.imageUrl}`
+}
               alt={product.name}
               className="w-full h-80 object-cover"
             />
