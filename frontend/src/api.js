@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://plants-shop-server-rho.vercel.app/api';
+const API_URL = 'http://plants-shop.duckdns.org/api';
 
 // Products API
 export const getProducts = async () => {
