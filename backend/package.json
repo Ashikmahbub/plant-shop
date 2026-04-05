@@ -9,9 +9,6 @@
     "dev": "nodemon server.js"
   },
   "keywords": [],
-
-
-  \
   
   "author": "",
   "license": "ISC",
