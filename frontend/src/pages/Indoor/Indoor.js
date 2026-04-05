@@ -37,7 +37,7 @@ const Indoor = () => {
         {products.map((product) => (
           <div key={product._id} className="bg-white shadow-lg rounded-lg overflow-hidden">
             <img
-              src={`${IMG_URL}${product.imageUrl}`}
+              src={`${IMG_URL}${product.image}`}
               alt={product.title}
               className="w-full h-80 object-cover"
             />
