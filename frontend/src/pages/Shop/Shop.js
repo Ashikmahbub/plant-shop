@@ -45,8 +45,11 @@ const Shop = () => {
         const data = await getProducts();
         let filteredProducts = data;
 
+
         if (selectedCategories.length > 0) {
-          filteredProducts = data.filter(product => selectedCategories.includes(product.category));
+          filteredProducts = data.filter(product =>
+  selectedCategories.includes(product.category.toLowerCase())
+);
         }
 
         if (sortOption === 'priceAsc') {
@@ -96,7 +99,7 @@ const Shop = () => {
               <label key={category} className="inline-flex items-center">
                 <input
                   type="checkbox"
-                  value={category}
+                  value={category.toLowerCase()}
                   onChange={(e) => {
                     const value = e.target.value;
                     setSelectedCategories((prev) =>
