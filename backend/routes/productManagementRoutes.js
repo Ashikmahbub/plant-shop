@@ -1,31 +1,44 @@
 const express = require('express');
-const { cloudinary, upload } = require('../config/cloudinary');
+const multer = require('multer');
 const {
   createProduct,
   updateProduct,
   deleteProduct,
   getAllProducts,
   getProductById
-} = require('../service/productService');
+} = require('../service/productService'); // Import the service functions
 const router = express.Router();
+
+// Multer setup for image uploading
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Save the files in the 'uploads' folder
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname); // Rename the file
+  },
+});
+
+const upload = multer({ storage: storage });
 
 // POST /api/admin/products - Add a product
 router.post('/admin/products', upload.single('image'), async (req, res) => {
   const { title, category, weight, price } = req.body;
-  const lowerCaseCategory = category.toLowerCase();
-
-  const imageUrl = req.file ? req.file.path : ''; // Cloudinary URL
+  const lowerCaseCategory = category.toLowerCase(); 
+  
+  const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
+  
 
   try {
     const productData = {
       title,
-      category: lowerCaseCategory,
+      category:lowerCaseCategory,
       weight,
       price,
       imageUrl
     };
 
-    await createProduct(productData);
+    await createProduct(productData); // Use the service to create a product
     res.status(201).json({ message: 'Product added successfully!' });
   } catch (error) {
     console.error('Error adding product:', error);
@@ -33,34 +46,28 @@ router.post('/admin/products', upload.single('image'), async (req, res) => {
   }
 });
 
-// PUT /api/admin/products/:id - Update a product
+ 
 router.put('/admin/products/:id', upload.single('image'), async (req, res) => {
   const { id } = req.params;
   const { title, category, weight, price } = req.body;
-  const lowerCaseCategory = category.toLowerCase();
+  const lowerCaseCategory = category.toLowerCase(); 
 
   try {
-    const product = await getProductById(id);
+     
+    const product = await getProductById(id);   
 
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
-
-    // Delete old image from Cloudinary if new image is uploaded
-    if (req.file && product.imageUrl) {
-      const urlParts = product.imageUrl.split('/');
-      const publicId = 'plants-shop/' + urlParts[urlParts.length - 1].split('.')[0];
-      await cloudinary.uploader.destroy(publicId);
-    }
-
-    const imageUrl = req.file ? req.file.path : product.imageUrl;
+ 
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : product.imageUrl;
 
     const updatedData = {
       title,
-      category: lowerCaseCategory,
+      category:lowerCaseCategory,
       weight,
       price,
-      imageUrl,
+      imageUrl,   
     };
 
     const result = await updateProduct(id, updatedData);
@@ -76,20 +83,13 @@ router.put('/admin/products/:id', upload.single('image'), async (req, res) => {
   }
 });
 
-// DELETE /api/admin/products/:id - Delete a product
+
+
+// DELETE /api/admin/products/:id - Delete a product by ID
 router.delete('/admin/products/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const product = await getProductById(id);
-
-    // Delete image from Cloudinary
-    if (product && product.imageUrl) {
-      const urlParts = product.imageUrl.split('/');
-      const publicId = 'plants-shop/' + urlParts[urlParts.length - 1].split('.')[0];
-      await cloudinary.uploader.destroy(publicId);
-    }
-
     const result = await deleteProduct(id);
 
     if (result.deletedCount > 0) {
