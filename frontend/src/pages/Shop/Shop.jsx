@@ -6,11 +6,12 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
-const navigate = useNavigate();
+ 
 
 const IMG_URL = process.env.REACT_APP_IMG_URL;
 
 const Shop = () => {
+  const navigate = useNavigate();
   const { addToCart } = useCart();
 
   const [products, setProducts] = useState([]);
