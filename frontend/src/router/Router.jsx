@@ -19,9 +19,9 @@ import Bonsai           from "../pages/plants/Bonsai";
 import Outdoor          from "../pages/plants/Outdoor";
 
 // ── Checkout ───────────────────────────
-import Checkout         from "../pages/checkout/Checkout";
-import OrderSummary     from "../pages/checkout/OrderSummary";
-import ThankYou         from "../pages/checkout/ThankYou";
+import Checkout         from "../pages/Checkout/Checkout";
+import OrderSummary     from "../pages/Checkout/OrderSummary";
+import ThankYou         from "../pages/Checkout/ThankYou";
 
 // ── Auth ───────────────────────────────
 import LoginForm        from "../components/forms/LoginForm";
