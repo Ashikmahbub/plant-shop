@@ -5,7 +5,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getProductById } from '../../services/api';
 
-const IMG_URL = process.env.REACT_APP_IMG_URL;
+const API_URL = 'http://plants-shop.duckdns.org';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -16,7 +16,10 @@ const ProductDetail = () => {
 
   useEffect(() => {
     getProductById(id)
-      .then(setProduct)
+      .then(data => {
+        console.log('Product data:', data); // remove after fixing
+        setProduct(data);
+      })
       .catch(() => toast.error('Failed to load product'))
       .finally(() => setLoading(false));
   }, [id]);
@@ -38,7 +41,7 @@ const ProductDetail = () => {
 
   const imageUrl = product.imageUrl?.startsWith('http')
     ? product.imageUrl
-    : `${IMG_URL}${product.imageUrl}`;
+    : `${API_URL}${product.imageUrl?.startsWith('/') ? '' : '/'}${product.imageUrl}`;
 
   return (
     <div className="container mx-auto px-4 py-10">
@@ -54,18 +57,27 @@ const ProductDetail = () => {
         <div className="md:w-1/2">
           <img
             src={imageUrl}
-            alt={product.title}
+            alt={product.title || 'Plant'}
+            onError={(e) => { e.target.src = '/placeholder.jpg'; }}
             className="w-full h-[500px] object-cover rounded-lg shadow-lg"
           />
         </div>
 
         {/* Details */}
         <div className="md:w-1/2 flex flex-col justify-center">
-          <span className="text-sm text-green-600 uppercase font-semibold tracking-wide mb-2">
-            {product.category}
-          </span>
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">{product.title}</h1>
-          <p className="text-3xl font-bold text-green-700 mb-4">৳ {product.price}</p>
+          {product.category && (
+            <span className="text-sm text-green-600 uppercase font-semibold tracking-wide mb-2">
+              {product.category}
+            </span>
+          )}
+
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+            {product.title || product.name || 'Unnamed Product'}
+          </h1>
+
+          <p className="text-3xl font-bold text-green-700 mb-4">
+            ৳ {product.price}
+          </p>
 
           {product.weight && (
             <p className="text-gray-500 mb-4">Weight: {product.weight} grams</p>
@@ -78,7 +90,7 @@ const ProductDetail = () => {
           <button
             onClick={() => {
               addToCart(product);
-              toast.success(`${product.title} added to cart!`, {
+              toast.success(`${product.title || 'Product'} added to cart!`, {
                 position: 'top-right',
                 autoClose: 2000,
               });
