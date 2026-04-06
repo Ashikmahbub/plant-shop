@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Banner from "../Banner/Banner";
+import Banner from "../../components/ui/Banner";
 import Bonsai from "../Categories/Bonsai";
 import Flower from "../Categories/Flower";
 import Indoor from "../Categories/Indoors";
 import Outdoor from "../Categories/Outdoor";
 import Packages from "../Categories/Packages";
-import SemiIndoor from "../Categories/Semi-Indoors";
+import SemiIndoor from "../Categories/SemiIndoors";
 
 const Home = () => {
   return (

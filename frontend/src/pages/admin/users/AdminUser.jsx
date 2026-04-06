@@ -1,4 +1,4 @@
-import { firestore,firebase } from '../../../Firebase/Firebase';  
+import { firestore,firebase } from '../../../services/firebase';  
 
 const createUser = (email, password, username) => {
   firebase.auth().createUserWithEmailAndPassword(email, password)
@@ -19,3 +19,4 @@ const createUser = (email, password, username) => {
       console.error("Error creating user: ", error);
     });
 };
+export default createUser;

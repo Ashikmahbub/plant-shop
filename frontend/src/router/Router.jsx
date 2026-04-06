@@ -1,67 +1,76 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
-import Main from "../pages/Home/Main";
+import Main             from "../pages/Home/Main";                        // src/pages/Home/Main.jsx
 
-// Public pages
-import Home from "../pages/Home/Home";
-import Shop from "../pages/Shop/Shop";
-import Indoor from "../pages/Indoor/Indoor";
-import SemiIndoorPlants from "../pages/Semi-Indoor/Semi-Indoor";
-import Bonsai from "../pages/Bonsai/Bonsai";
-import Categories from "../pages/Categories/Indoors";
-import Cart from "../pages/Cart/Cart";
-import Checkout from "../pages/Checkout/Checkout";
-import ThankYou from "../pages/Thankyou/ThankYou";
-import OrderSummary from "../pages/OrderSummary/OrderSummary";
-import LoginForm from "../components/LoginForm";
-import SignUpForm from "../components/forms/SignUpForm";
+// ── Public ────────────────────────────────────────────────────
+import Home             from "../pages/Home/Home";
+import Shop             from "../pages/Shop/Shop";
+import Cart             from "../pages/Cart/Cart";
 
-// Admin pages
-import Dashboard from "../pages/AdminDashboard/Dashboard";
-import AddProduct from "../pages/AdminDashboard/AddProduct";
-import ManageProducts from "../pages/AdminDashboard/ManageProducts";
-import ManageOrders from "../pages/AdminDashboard/MangeOrders";
-import OrderEdit from "../pages/AdminDashboard/OrderEdit";
-import User from "../pages/AdminDashboard/User";
+// ── Categories (home showcase sections) ───────────────────────
+import Categories       from "../pages/Categories/Indoors";
+import SemiIndoor       from "../pages/Categories/SemiIndoors";
 
-import PrivateRoute from "../components/PrivateRoute";
+// ── Plant listing pages (shop by type) ────────────────────────
+import Indoor           from "../pages/plants/Indoor";
+import Bonsai           from "../pages/plants/Bonsai";
+import Outdoor          from "../pages/plants/Outdoor";
 
-const adminRoute = (element) => <PrivateRoute>{element}</PrivateRoute>;
+// ── Checkout flow ─────────────────────────────────────────────
+import Checkout         from "../pages/checkout/Checkout";
+import OrderSummary     from "../pages/checkout/OrderSummary";
+import ThankYou         from "../pages/checkout/ThankYou";
+
+// ── Auth ──────────────────────────────────────────────────────
+import LoginForm        from "../components/forms/LoginForm";
+import SignUpForm       from "../components/forms/SignUpForm";
+
+// ── Admin ─────────────────────────────────────────────────────
+import Dashboard        from "../pages/admin/dashboard/Dashboard";
+import AddProduct       from "../pages/admin/products/AddProduct";
+import ManageProducts   from "../pages/admin/products/ManageProducts";
+import ManageOrders     from "../pages/admin/orders/ManageOrders";
+import OrderEdit        from "../pages/admin/orders/OrderEdit";
+import AdminUser        from "../pages/admin/users/AdminUser";
+import SalesStats       from "../pages/admin/sales/SalesStatistics";
+
+import PrivateRoute     from "../components/PrivateRoute";
+
+const adminRoute = (el) => <PrivateRoute>{el}</PrivateRoute>;
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Main />,
     children: [
-      // ── Public routes ──────────────────────────────────────────
-      { index: true, element: <Home /> },
-      { path: "categories", element: <Categories /> },
-      { path: "shop",       element: <Shop /> },
-      { path: "indoor",     element: <Indoor /> },
-      { path: "semi-indoor", element: <SemiIndoorPlants /> },
-      { path: "bonsai",     element: <Bonsai /> },
-      { path: "cart",       element: <Cart /> },
-      { path: "checkout",   element: <Checkout /> },
-      { path: "order-summary", element: <OrderSummary /> },
+      { index: true,                element: <Home /> },
+      { path: "shop",               element: <Shop /> },
+      { path: "categories",         element: <Categories /> },
+      { path: "indoor",             element: <Indoor /> },
+      { path: "bonsai",             element: <Bonsai /> },
+      { path: "outdoor",            element: <Outdoor /> },
+      { path: "semi-indoor",        element: <SemiIndoor /> },
+      { path: "cart",               element: <Cart /> },
+      { path: "checkout",           element: <Checkout /> },
+      { path: "order-summary",      element: <OrderSummary /> },
       { path: "thank-you/:orderId", element: <ThankYou /> },
-      { path: "login",      element: <LoginForm /> },
-      { path: "signup",     element: <SignUpForm /> },
+      { path: "login",              element: <LoginForm /> },
+      { path: "signup",             element: <SignUpForm /> },
 
-      // ── Admin routes (/admin/*) ────────────────────────────────
       {
         path: "admin",
         element: adminRoute(<Dashboard />),
         children: [
-          { index: true,                        element: <Navigate to="orders" replace /> },
-          { path: "add-product",                element: adminRoute(<AddProduct />) },
-          { path: "users",                      element: adminRoute(<User />) },
-          { path: "products",                   element: adminRoute(<ManageProducts />) },
-          { path: "orders",                     element: adminRoute(<ManageOrders />) },
-          { path: "orders/:orderId/edit",       element: adminRoute(<OrderEdit />) },
+          { index: true,                  element: <Navigate to="orders" replace /> },
+          { path: "orders",               element: adminRoute(<ManageOrders />) },
+          { path: "orders/:orderId/edit", element: adminRoute(<OrderEdit />) },
+          { path: "products",             element: adminRoute(<ManageProducts />) },
+          { path: "products/add",         element: adminRoute(<AddProduct />) },
+          { path: "users",                element: adminRoute(<AdminUser />) },
+          { path: "sales",                element: adminRoute(<SalesStats />) },
         ],
       },
 
-      // ── Catch-all 404 ─────────────────────────────────────────
       { path: "*", element: <Navigate to="/" replace /> },
     ],
   },
