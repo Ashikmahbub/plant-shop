@@ -4,7 +4,7 @@ const { connectToDatabase } = require('../config/dbConnection'); // Import the c
 const { ObjectId } = require('mongodb');
 
  
-router.get('/sales-statistics', async (req, res) => {
+router.get('/admin/sales-statistics', async (req, res) => {
   try {
     const db = await connectToDatabase();  
     const ordersCollection = db.collection('orders');
