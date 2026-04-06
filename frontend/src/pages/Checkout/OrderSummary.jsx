@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import { useLocation } from 'react-router-dom';
+ 
 
 const API_URL = "http://plants-shop.duckdns.org/api/";
 const IMG_URL = process.env.REACT_APP_IMG_URL;

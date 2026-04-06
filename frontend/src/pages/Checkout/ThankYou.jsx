@@ -1,3 +1,4 @@
+import { useLocation, useParams, Link } from 'react-router-dom';
 const ThankYou = () => {
   const { orderId } = useParams();
   const location = useLocation();
