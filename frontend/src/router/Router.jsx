@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
-import Main from "../../Main";
+import Main from "../Main";       
 
 // Public pages
 import Home from "../pages/Home/Home";
