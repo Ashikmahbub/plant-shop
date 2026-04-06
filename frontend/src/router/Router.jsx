@@ -3,6 +3,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import Main             from "../pages/Home/Main";
+import ProductDetail from "../pages/Shop/ProductDetail";
 
 // ── Public ─────────────────────────────
 import Home             from "../pages/Home/Home";
@@ -59,6 +60,7 @@ export const router = createBrowserRouter([
       { path: "thank-you/:orderId", element: <ThankYou /> },
       { path: "login",              element: <LoginForm /> },
       { path: "signup",             element: <SignUpForm /> },
+      { path: "product/:id", element: <ProductDetail /> },
       { path: "product/:id", element: <ProductDetail /> },
 
      {
