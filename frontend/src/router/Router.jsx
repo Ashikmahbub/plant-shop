@@ -1,31 +1,33 @@
+
+
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
-import Main             from "../pages/Home/Main";                        // src/pages/Home/Main.jsx
+import Main             from "../pages/Home/Main";
 
-// ── Public ────────────────────────────────────────────────────
+// ── Public ─────────────────────────────
 import Home             from "../pages/Home/Home";
 import Shop             from "../pages/Shop/Shop";
 import Cart             from "../pages/Cart/Cart";
 
-// ── Categories (home showcase sections) ───────────────────────
+// ── Categories ─────────────────────────
 import Categories       from "../pages/Categories/Indoors";
 import SemiIndoor       from "../pages/Categories/SemiIndoors";
 
-// ── Plant listing pages (shop by type) ────────────────────────
+// ── Plants ─────────────────────────────
 import Indoor           from "../pages/plants/Indoor";
 import Bonsai           from "../pages/plants/Bonsai";
 import Outdoor          from "../pages/plants/Outdoor";
 
-// ── Checkout flow ─────────────────────────────────────────────
+// ── Checkout ───────────────────────────
 import Checkout         from "../pages/checkout/Checkout";
 import OrderSummary     from "../pages/checkout/OrderSummary";
 import ThankYou         from "../pages/checkout/ThankYou";
 
-// ── Auth ──────────────────────────────────────────────────────
+// ── Auth ───────────────────────────────
 import LoginForm        from "../components/forms/LoginForm";
 import SignUpForm       from "../components/forms/SignUpForm";
 
-// ── Admin ─────────────────────────────────────────────────────
+// ── Admin (FIXED CASE) ─────────────────
 import Dashboard        from "../pages/admin/dashboard/Dashboard";
 import AddProduct       from "../pages/admin/products/AddProduct";
 import ManageProducts   from "../pages/admin/products/ManageProducts";
@@ -34,6 +36,7 @@ import OrderEdit        from "../pages/admin/orders/OrderEdit";
 import AdminUser        from "../pages/admin/users/AdminUser";
 import SalesStats       from "../pages/admin/sales/SalesStatistics";
 
+// ── Private Route ──────────────────────
 import PrivateRoute     from "../components/PrivateRoute";
 
 const adminRoute = (el) => <PrivateRoute>{el}</PrivateRoute>;
