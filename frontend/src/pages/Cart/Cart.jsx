@@ -44,7 +44,7 @@ const Cart = () => {
                 <div className="flex justify-between items-center">
                   <div className="flex items-center">
                     <img
-                      src={`https://plants-shop-server-rho.vercel.app/${item.imageUrl}`}
+                      src={`http://plants-shop.duckdns.org/${item.imageUrl}`}
                       alt={item.title}
                       className="w-16 h-16 mr-4"
                     />
