@@ -60,20 +60,21 @@ export const router = createBrowserRouter([
       { path: "login",              element: <LoginForm /> },
       { path: "signup",             element: <SignUpForm /> },
 
-      {
-        path: "admin",
-        element: adminRoute(<Dashboard />),
-        children: [
-          { index: true,                  element: <Navigate to="orders" replace /> },
-          { path: "orders",               element: adminRoute(<ManageOrders />) },
-          { path: "orders/:orderId/edit", element: adminRoute(<OrderEdit />) },
-          { path: "products",             element: adminRoute(<ManageProducts />) },
-          { path: "products/add",         element: adminRoute(<AddProduct />) },
-          { path: "users",                element: adminRoute(<AdminUser />) },
-          { path: "sales",                element: adminRoute(<SalesStats />) },
-        ],
-      },
+     {
+  path: "admin",
+  element: adminRoute(<Dashboard />),
+  children: [
+    { index: true, element: adminRoute(<SalesStats />) }, // 👈 dashboard default
 
+    { path: "orders",               element: adminRoute(<ManageOrders />) },
+    { path: "orders/:orderId/edit", element: adminRoute(<OrderEdit />) },
+    { path: "products",             element: adminRoute(<ManageProducts />) },
+    { path: "products/add",         element: adminRoute(<AddProduct />) },
+    { path: "users",                element: adminRoute(<AdminUser />) },
+    { path: "sales",                element: adminRoute(<SalesStats />) },
+  ],
+}
+,
       { path: "*", element: <Navigate to="/" replace /> },
     ],
   },
