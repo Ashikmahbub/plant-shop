@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import Banner from "../../components/ui/Banner";
 import Bonsai from "../Categories/Bonsai";
 import Flower from "../Categories/Flower";
@@ -27,19 +27,37 @@ const Home = () => {
       <Banner />
       <div className="text-center mt-10">
         <button
-          onClick={() => navigate('/shop')}
+          onClick={() => navigate("/shop")}
           className="bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition duration-300"
         >
           Shop Now
         </button>
       </div>
 
-      <CategorySection to="/indoor">       <Indoor />     </CategorySection>
-      <CategorySection to="/semi-indoor">  <SemiIndoor /> </CategorySection>
-      <CategorySection to="/shop?category=flower">  <Flower />    </CategorySection>
-      <CategorySection to="/shop?category=bonsai">  <Bonsai />    </CategorySection>
-      <CategorySection to="/outdoor">      <Outdoor />    </CategorySection>
-      <CategorySection to="/shop?category=packages"><Packages />  </CategorySection>
+      <CategorySection to="/shop?category=indoor">
+        {" "}
+        <Indoor />{" "}
+      </CategorySection>
+      <CategorySection to="/shop?category=semi-indoor">
+        {" "}
+        <SemiIndoor />{" "}
+      </CategorySection>
+      <CategorySection to="/shop?category=flower">
+        {" "}
+        <Flower />{" "}
+      </CategorySection>
+      <CategorySection to="/shop?category=bonsai">
+        {" "}
+        <Bonsai />{" "}
+      </CategorySection>
+      <CategorySection to="/shop?category=outdoor">
+        {" "}
+        <Outdoor />{" "}
+      </CategorySection>
+      <CategorySection to="/shop?category=packages">
+        {" "}
+        <Packages />{" "}
+      </CategorySection>
     </div>
   );
 };

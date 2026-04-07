@@ -23,7 +23,7 @@ const upload = multer({ storage });
 // ================== CREATE ==================
 router.post('/admin/products', upload.single('image'), async (req, res) => {
   try {
-    const { title, category, weight, price, description } = req.body;
+    const { title, category, weight, price, description, sku } = req.body;
 
     const productData = {
       title,
@@ -31,14 +31,12 @@ router.post('/admin/products', upload.single('image'), async (req, res) => {
       weight,
       price,
       description,
+      sku,
       imageUrl: req.file ? `/uploads/${req.file.filename}` : ''
     };
 
     await createProduct(productData);
-
-    // 🔥 CLEAR CACHE
     await redis.del('plantshop:products');
-
     res.status(201).json({ message: 'Product added successfully!' });
 
   } catch (error) {
@@ -51,7 +49,7 @@ router.post('/admin/products', upload.single('image'), async (req, res) => {
 router.put('/admin/products/:id', upload.single('image'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, category, weight, price, description } = req.body;
+    const { title, category, weight, price, description, sku } = req.body;
 
     const product = await getProductById(id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
@@ -62,13 +60,14 @@ router.put('/admin/products/:id', upload.single('image'), async (req, res) => {
       weight,
       price,
       description,
+      sku,
       imageUrl: req.file ? `/uploads/${req.file.filename}` : product.imageUrl
     };
 
     const result = await updateProduct(id, updatedData);
 
     if (result.modifiedCount > 0) {
-      await redis.del('plantshop:products'); // 🔥 CLEAR CACHE
+      await redis.del('plantshop:products');
       res.json({ message: 'Product updated successfully!' });
     } else {
       res.status(404).json({ message: 'No changes made' });
@@ -86,7 +85,7 @@ router.delete('/admin/products/:id', async (req, res) => {
     const result = await deleteProduct(req.params.id);
 
     if (result.deletedCount > 0) {
-      await redis.del('plantshop:products'); // 🔥 CLEAR CACHE
+      await redis.del('plantshop:products');
       res.json({ message: 'Product deleted successfully!' });
     } else {
       res.status(404).json({ message: 'Product not found' });
@@ -109,9 +108,7 @@ router.get('/admin/products', async (req, res) => {
     }
 
     const products = await getAllProducts();
-
     await redis.setEx('plantshop:products', 120, JSON.stringify(products));
-
     res.json(products);
 
   } catch (error) {

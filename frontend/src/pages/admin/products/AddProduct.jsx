@@ -2,22 +2,41 @@ import { useState } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaWeightHanging, FaTag, FaBoxOpen, FaImage, FaAlignLeft } from 'react-icons/fa';
+import { FaWeightHanging, FaTag, FaBoxOpen, FaImage, FaAlignLeft, FaBarcode } from 'react-icons/fa';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-const AddProduct = () => {
+const generateSKU = (title, category) => {
+  const titlePart = title.trim().split(' ')[0].toUpperCase().slice(0, 4);
+  const catPart = category.toUpperCase().slice(0, 3);
+  const randPart = Math.floor(1000 + Math.random() * 9000);
+  return `${catPart}-${titlePart}-${randPart}`;
+};
+
+const AddProduct = ({ onProductAdded }) => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('indoor');
   const [weight, setWeight] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
+  const [sku, setSku] = useState('');
   const [errors, setErrors] = useState({});
 
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+  // Auto-generate SKU when title or category changes
+  const handleTitleChange = (e) => {
+    const val = e.target.value;
+    setTitle(val);
+    if (val.trim()) setSku(generateSKU(val, category));
   };
+
+  const handleCategoryChange = (e) => {
+    const val = e.target.value;
+    setCategory(val);
+    if (title.trim()) setSku(generateSKU(title, val));
+  };
+
+  const handleImageChange = (e) => setImage(e.target.files[0]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,6 +59,7 @@ const AddProduct = () => {
     formData.append('price', price);
     formData.append('description', description);
     formData.append('image', image);
+    formData.append('sku', sku);
 
     try {
       await axios.post(`${API_URL}/admin/products`, formData, {
@@ -47,12 +67,15 @@ const AddProduct = () => {
       });
 
       toast.success('Product added successfully!');
+      if (onProductAdded) onProductAdded();
+
       setTitle('');
       setCategory('indoor');
       setWeight('');
       setPrice('');
       setDescription('');
       setImage(null);
+      setSku('');
       setErrors({});
       document.getElementById('image-input').value = null;
 
@@ -75,12 +98,29 @@ const AddProduct = () => {
             <input
               type="text"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={handleTitleChange}
               className={`input input-bordered w-full pl-10 py-2 focus:outline-none focus:ring-2 focus:ring-green-600 ${errors.title ? 'border-red-500' : ''}`}
               placeholder="Enter product title"
             />
           </div>
           {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+        </div>
+
+        {/* SKU — auto-generated, editable */}
+        <div className="mb-5">
+          <label className="block text-gray-700 font-semibold mb-2">
+            SKU <span className="text-xs text-gray-400 font-normal">(auto-generated, editable)</span>
+          </label>
+          <div className="relative">
+            <FaBarcode className="absolute left-3 top-3 text-gray-400" />
+            <input
+              type="text"
+              value={sku}
+              onChange={(e) => setSku(e.target.value)}
+              className="input input-bordered w-full pl-10 py-2 focus:outline-none focus:ring-2 focus:ring-green-600 bg-gray-50"
+              placeholder="SKU will auto-generate"
+            />
+          </div>
         </div>
 
         {/* Description */}
@@ -106,7 +146,7 @@ const AddProduct = () => {
             <FaBoxOpen className="absolute left-3 top-3 text-gray-400" />
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={handleCategoryChange}
               className="select select-bordered w-full pl-10 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
             >
               <option value="indoor">Indoor</option>
@@ -136,7 +176,7 @@ const AddProduct = () => {
           {errors.weight && <p className="text-red-500 text-sm mt-1">{errors.weight}</p>}
         </div>
 
-        {/* Price BDT */}
+        {/* Price */}
         <div className="mb-5">
           <label className="block text-gray-700 font-semibold mb-2">Price (৳ BDT)</label>
           <div className="relative">

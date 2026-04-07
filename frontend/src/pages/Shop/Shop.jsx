@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { getProducts } from "../../services/api";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,30 +13,37 @@ const Shop = () => {
   const { addToCart } = useCart();
 
   const [allProducts, setAllProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState([]);       // always lowercase
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [sortOption, setSortOption] = useState("default");
   const [loading, setLoading] = useState(true);
 
-  // ✅ Get search query from URL (Navbar search)
   const params = new URLSearchParams(location.search);
   const urlSearch = params.get("search") || "";
+  const urlCategory = params.get("category") || "";       // e.g. "indoor"
 
-  // ✅ Local search (input field)
   const [searchQuery, setSearchQuery] = useState(urlSearch);
 
   useEffect(() => {
     setSearchQuery(urlSearch);
   }, [urlSearch]);
 
+  // ✅ Fetch products and normalize categories to lowercase
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const data = await getProducts();
-        setAllProducts(data);
+
+        // Normalize all product categories to lowercase
+        const normalized = data.map((p) => ({
+          ...p,
+          category: p.category?.toLowerCase().trim(),
+        }));
+
+        setAllProducts(normalized);
 
         const allCategories = [
-          ...new Set(data.map((p) => p.category).filter(Boolean)),
+          ...new Set(normalized.map((p) => p.category).filter(Boolean)),
         ];
         setCategories(allCategories);
       } catch (error) {
@@ -50,21 +57,28 @@ const Shop = () => {
     fetchProducts();
   }, []);
 
-  // ✅ FILTER + SEARCH + SORT (FIXED)
+  // ✅ Auto-select category from URL once categories are loaded
+  useEffect(() => {
+    if (urlCategory && categories.length > 0) {
+      const match = categories.find(
+        (c) => c === urlCategory.toLowerCase()
+      );
+      if (match) setSelectedCategories([match]);
+    }
+  }, [urlCategory, categories]);
+
+  // ✅ Filter + Search + Sort
   const filteredProducts = useMemo(() => {
     let result = [...allProducts];
 
-    // Category filter
     if (selectedCategories.length > 0) {
       result = result.filter((p) =>
-        selectedCategories.includes(p.category?.toLowerCase())
+        selectedCategories.includes(p.category)
       );
     }
 
-    // Search filter (NAME + SKU)
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-
       result = result.filter(
         (p) =>
           p.title?.toLowerCase().includes(q) ||
@@ -72,7 +86,6 @@ const Shop = () => {
       );
     }
 
-    // Sorting
     if (sortOption === "priceAsc") {
       result.sort((a, b) => Number(a.price) - Number(b.price));
     } else if (sortOption === "priceDesc") {
@@ -95,16 +108,30 @@ const Shop = () => {
             key={category}
             onClick={() =>
               setSelectedCategories((prev) =>
-                prev.includes(category.toLowerCase())
-                  ? prev.filter((c) => c !== category.toLowerCase())
-                  : [...prev, category.toLowerCase()]
+                prev.includes(category)
+                  ? prev.filter((c) => c !== category)
+                  : [...prev, category]
               )
             }
-            className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800"
+            className={`px-4 py-2 rounded transition-colors duration-200 ${
+              selectedCategories.includes(category)
+                ? "bg-green-900 text-white"
+                : "bg-green-700 text-white hover:bg-green-800"
+            }`}
           >
             {category}
           </button>
         ))}
+
+        {/* Clear filter button */}
+        {selectedCategories.length > 0 && (
+          <button
+            onClick={() => setSelectedCategories([])}
+            className="px-4 py-2 rounded border border-green-700 text-green-700 hover:bg-green-50"
+          >
+            Clear ✕
+          </button>
+        )}
       </div>
 
       {/* Filters */}
@@ -159,7 +186,6 @@ const Shop = () => {
               alt={product.title}
               className="w-full h-80 object-cover cursor-pointer"
             />
-
             <div className="p-4">
               <h3
                 onClick={() => navigate(`/product/${product._id}`)}
@@ -167,14 +193,10 @@ const Shop = () => {
               >
                 {product.title}
               </h3>
-
-              {/* ✅ SKU visible */}
               {product.sku && (
                 <p className="text-xs text-gray-400">SKU: {product.sku}</p>
               )}
-
               <p className="text-gray-700 mt-2">৳ {product.price}</p>
-
               <button
                 onClick={() => {
                   addToCart(product);
