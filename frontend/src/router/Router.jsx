@@ -27,7 +27,7 @@ import ThankYou         from "../pages/Checkout/ThankYou";
 // ── Auth ───────────────────────────────
 import LoginForm        from "../components/forms/LoginForm";
 import SignUpForm       from "../components/forms/SignUpForm";
-import UserProfile from "../pages/User/UserProfile";
+import UserProfile from "../components/UserProfile";
 
 // ── Admin (FIXED CASE) ─────────────────
 import Dashboard        from "../pages/admin/dashboard/Dashboard";
