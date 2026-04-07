@@ -1,163 +1,145 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaSearch, FaShoppingCart } from "react-icons/fa";
-import { useCart } from "../../context/CartContext"; // Assuming you have a useCart hook
+import { FaSearch, FaShoppingCart, FaBars } from "react-icons/fa";
+import { useCart } from "../../context/CartContext";
 import { AuthContext } from "../../context/AuthContext";
 
 const Navbar = () => {
   const { cart } = useCart();
-  const { user, userSignOut } = useContext(AuthContext); // Getting user and logout from AuthContext
+  const { user, userSignOut } = useContext(AuthContext);
   const navigate = useNavigate();
-  const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+
+  const cartItemCount = cart.reduce((t, i) => t + i.quantity, 0);
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  const handleToggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-  };
+  // ✅ ADMIN CHECK
+  const isAdmin = user?.email === "admin@plantshop.bd";  
+
   const handleSearchSubmit = () => {
     if (!search.trim()) return;
-
     navigate(`/shop?search=${encodeURIComponent(search)}`);
-  };
-  const handleLogOut = () => {
-    return userSignOut();
+    setIsMobileMenuOpen(false);
   };
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="bg-white shadow-md relative z-50">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Brand */}
-        <div className="text-2xl font-bold text-green-700">
-          <Link to="/">🌿 PlantShop</Link>
+
+        {/* LEFT */}
+        <div className="flex items-center gap-3">
+          <button
+            className="md:hidden text-green-700"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <FaBars size={22} />
+          </button>
+
+          <Link to="/" className="text-xl font-bold text-green-700">
+            🌿 PlantShop
+          </Link>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative hidden md:flex md:w-1/3">
+        {/* SEARCH (DESKTOP) */}
+        <div className="hidden md:flex md:w-1/3 relative">
           <input
-            type="text"
             value={search}
-            onChange={handleSearchChange}
+            onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearchSubmit()}
-            placeholder="Search plants..."
-            className="border border-green-700 px-4 py-2 rounded-l w-full focus:outline-none"
+            className="border border-green-700 px-4 py-2 rounded-l w-full"
+            placeholder="Search..."
           />
-
           <button
             onClick={handleSearchSubmit}
-            className="absolute inset-y-0 right-0 px-4 py-2 bg-green-700 text-white rounded-r hover:bg-green-800 transition duration-300 flex items-center"
+            className="absolute right-0 top-0 bottom-0 px-4 bg-green-700 text-white"
           >
             <FaSearch />
           </button>
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden text-green-700 hover:text-green-900 transition duration-300"
-          onClick={handleToggleMobileMenu}
-        >
-          <FaSearch size={24} />
-        </button>
+        {/* RIGHT */}
+        <div className="flex items-center gap-4">
 
-        {/* Navbar Links */}
-        <ul
-          className={`flex flex-col md:flex-row md:space-x-6 text-green-700 font-semibold md:items-center ${isMobileMenuOpen ? "block" : "hidden"}`}
-        >
-          <li>
-            <Link
-              to="/"
-              className="block py-2 md:py-0 hover:text-green-900 transition duration-300"
+          {/* ✅ ADMIN BUTTON */}
+          {isAdmin && (
+            <button
+              onClick={() => navigate("/admin")}
+              className="bg-green-700 text-white px-3 py-1 rounded hover:bg-green-800 transition"
             >
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/shop"
-              className="block py-2 md:py-0 hover:text-green-900 transition duration-300"
-            >
-              Shop
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/about"
-              className="block py-2 md:py-0 hover:text-green-900 transition duration-300"
-            >
-              About Us
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/contact"
-              className="block py-2 md:py-0 hover:text-green-900 transition duration-300"
-            >
-              Contact
-            </Link>
-          </li>
-        </ul>
+              Admin
+            </button>
+          )}
 
-        {/* Profile Section */}
-        <div className="flex items-center space-x-4">
-          <Link
-            to="/cart"
-            className="relative text-green-700 hover:text-green-900 transition duration-300 hidden md:flex items-center"
+          {/* CART */}
+          <div
+            onClick={() => navigate("/cart")}
+            className="relative cursor-pointer text-green-700"
           >
-            <FaShoppingCart size={24} />
+            <FaShoppingCart size={22} />
             {cartItemCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                 {cartItemCount}
               </span>
             )}
-          </Link>
+          </div>
 
-          {/* Check if user exists */}
+          {/* AUTH */}
           {user ? (
-            <div className="flex items-center space-x-3">
-              <Link
-                to="/profile"
-                className="flex items-center space-x-2 hover:opacity-80 transition"
-              >
-                <img
-                  src={
-                    user.photoURL ||
-                    `https://ui-avatars.com/api/?name=${user.displayName || user.email}&background=166534&color=fff`
-                  }
-                  alt="Profile"
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-                <span className="text-green-700 font-medium hidden md:block">
-                  {user.displayName || user.email}
-                </span>
-              </Link>
-              <button
-                onClick={handleLogOut}
-                className="bg-green-700 text-white px-3 py-2 rounded hover:bg-green-800 transition duration-300"
-              >
-                Logout
-              </button>
-            </div>
+            <button
+              onClick={userSignOut}
+              className="bg-green-700 text-white px-3 py-1 rounded hover:bg-green-800 transition"
+            >
+              Logout
+            </button>
           ) : (
-            <div className="flex items-center space-x-3">
-              <Link
-                to="/login"
-                className="bg-green-700 text-white px-3 py-2 rounded hover:bg-green-800 transition duration-300"
-              >
-                Login
-              </Link>
-              <Link
-                to="/signup"
-                className="bg-white text-green-700 px-3 py-2 rounded border border-green-700 hover:bg-green-700 hover:text-white transition duration-300"
-              >
-                Sign Up
-              </Link>
-            </div>
+            <Link to="/login" className="text-green-700 font-medium">
+              Login
+            </Link>
           )}
         </div>
       </div>
+
+      {/* MOBILE MENU */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-white border-t px-4 pb-4 space-y-3">
+
+          {/* SEARCH */}
+          <div className="flex">
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="border w-full px-3 py-2"
+              placeholder="Search..."
+            />
+            <button
+              onClick={handleSearchSubmit}
+              className="bg-green-700 text-white px-4"
+            >
+              <FaSearch />
+            </button>
+          </div>
+
+          {/* LINKS */}
+          <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+          <Link to="/shop" onClick={() => setIsMobileMenuOpen(false)}>Shop</Link>
+          <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
+
+          {/* ADMIN (MOBILE) */}
+          {isAdmin && (
+            <button
+              onClick={() => {
+                navigate("/admin");
+                setIsMobileMenuOpen(false);
+              }}
+              className="block w-full text-left text-green-700 font-semibold"
+            >
+              Admin
+            </button>
+          )}
+
+        </div>
+      )}
     </nav>
   );
 };

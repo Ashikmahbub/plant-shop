@@ -5,15 +5,23 @@ import Footer from '../../components/layout/Footer';
 
 const Main = () => {
   const location = useLocation();
-  
-  const hideLayout = location.pathname.includes('login') || 
-                     location.pathname.includes('signup');
+
+  const hideLayout =
+    location.pathname.includes('login') ||
+    location.pathname.includes('signup');
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
+
       {!hideLayout && <Navbar />}
-      <Outlet />
+
+      {/* MAIN CONTENT */}
+      <div className="flex-1 w-full">
+        <Outlet />
+      </div>
+
       {!hideLayout && <Footer />}
+
     </div>
   );
 };

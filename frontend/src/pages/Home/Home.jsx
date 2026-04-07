@@ -13,7 +13,7 @@ const CategorySection = ({ to, children }) => {
   return (
     <div
       onClick={() => navigate(to)}
-      className="cursor-pointer hover:opacity-90 transition-opacity duration-200"
+      className="cursor-pointer hover:opacity-90 transition duration-200 px-4 mt-8"
     >
       {children}
     </div>
@@ -22,42 +22,48 @@ const CategorySection = ({ to, children }) => {
 
 const Home = () => {
   const navigate = useNavigate();
+
   return (
-    <div>
+    <div className="w-full overflow-hidden">
+
+      {/* Banner */}
       <Banner />
-      <div className="text-center mt-10">
+
+      {/* Shop Button */}
+      <div className="text-center mt-6 px-4">
         <button
           onClick={() => navigate("/shop")}
-          className="bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition duration-300"
+          className="w-full sm:w-auto bg-green-600 text-white px-6 py-3 rounded-lg text-base md:text-lg font-semibold hover:bg-green-700 transition"
         >
           Shop Now
         </button>
       </div>
 
+      {/* Sections */}
       <CategorySection to="/shop?category=indoor">
-        {" "}
-        <Indoor />{" "}
+        <Indoor />
       </CategorySection>
+
       <CategorySection to="/shop?category=semi-indoor">
-        {" "}
-        <SemiIndoor />{" "}
+        <SemiIndoor />
       </CategorySection>
+
       <CategorySection to="/shop?category=flower">
-        {" "}
-        <Flower />{" "}
+        <Flower />
       </CategorySection>
+
       <CategorySection to="/shop?category=bonsai">
-        {" "}
-        <Bonsai />{" "}
+        <Bonsai />
       </CategorySection>
+
       <CategorySection to="/shop?category=outdoor">
-        {" "}
-        <Outdoor />{" "}
+        <Outdoor />
       </CategorySection>
+
       <CategorySection to="/shop?category=packages">
-        {" "}
-        <Packages />{" "}
+        <Packages />
       </CategorySection>
+
     </div>
   );
 };
