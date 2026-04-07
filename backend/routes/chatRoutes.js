@@ -28,17 +28,27 @@ router.post("/chat", async (req, res) => {
       }
 
       const latest = orders[0];
-
+      const isDelivered = latest.deliveryStatus === "Delivered";
       return res.json({
-        reply: `
-📦 Order Status
+        type: "order",
+        data: {
+          id: latest._id,
+          displayId: latest.orderCode,
 
-🆔 Order ID: ${latest._id}
-🚚 Status: ${latest.deliveryStatus}
-💰 Total: ৳ ${latest.totalAmount}
+          items: latest.cart.map((item) => ({
+            title: item.title,
+            quantity: item.quantity,
+          })),
 
-Thank you for shopping with us 🌿
-`,
+          status: latest.deliveryStatus,
+          payment: latest.paymentStatus || "N/A",
+          total: latest.orderTotal,
+          date: new Date(latest.createdAt).toLocaleDateString(),
+
+          message: isDelivered
+            ? "Thank you for shopping with us 🌿"
+            : "Your order is being processed 🚚",
+        },
       });
     }
 
