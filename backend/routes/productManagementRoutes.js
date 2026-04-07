@@ -6,16 +6,15 @@ const {
   deleteProduct,
   getAllProducts,
   getProductById
-} = require('../service/productService'); // Import the service functions
+} = require('../service/productService');
 const router = express.Router();
 
-// Multer setup for image uploading
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Save the files in the 'uploads' folder
+    cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname); // Rename the file
+    cb(null, Date.now() + '-' + file.originalname);
   },
 });
 
@@ -23,22 +22,21 @@ const upload = multer({ storage: storage });
 
 // POST /api/admin/products - Add a product
 router.post('/admin/products', upload.single('image'), async (req, res) => {
-  const { title, category, weight, price } = req.body;
-  const lowerCaseCategory = category.toLowerCase(); 
-  
+  const { title, category, weight, price, description } = req.body;
+  const lowerCaseCategory = category.toLowerCase();
   const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
-  
 
   try {
     const productData = {
       title,
-      category:lowerCaseCategory,
+      category: lowerCaseCategory,
       weight,
       price,
+      description,
       imageUrl
     };
 
-    await createProduct(productData); // Use the service to create a product
+    await createProduct(productData);
     res.status(201).json({ message: 'Product added successfully!' });
   } catch (error) {
     console.error('Error adding product:', error);
@@ -46,28 +44,28 @@ router.post('/admin/products', upload.single('image'), async (req, res) => {
   }
 });
 
- 
+// PUT /api/admin/products/:id - Update a product
 router.put('/admin/products/:id', upload.single('image'), async (req, res) => {
   const { id } = req.params;
-  const { title, category, weight, price } = req.body;
-  const lowerCaseCategory = category.toLowerCase(); 
+  const { title, category, weight, price, description } = req.body;
+  const lowerCaseCategory = category.toLowerCase();
 
   try {
-     
-    const product = await getProductById(id);   
+    const product = await getProductById(id);
 
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
- 
+
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : product.imageUrl;
 
     const updatedData = {
       title,
-      category:lowerCaseCategory,
+      category: lowerCaseCategory,
       weight,
       price,
-      imageUrl,   
+      description,
+      imageUrl,
     };
 
     const result = await updateProduct(id, updatedData);
@@ -83,9 +81,7 @@ router.put('/admin/products/:id', upload.single('image'), async (req, res) => {
   }
 });
 
-
-
-// DELETE /api/admin/products/:id - Delete a product by ID
+// DELETE /api/admin/products/:id - Delete a product
 router.delete('/admin/products/:id', async (req, res) => {
   const { id } = req.params;
 
