@@ -5,7 +5,7 @@ const {
   getProductById, 
   createProduct, 
   updateProduct, 
-  deleteProduct 
+  deleteProduct,
 } = require('../service/productService');
 
 const router = express.Router();

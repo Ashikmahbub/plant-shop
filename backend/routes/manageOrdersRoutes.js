@@ -9,6 +9,8 @@ const {
   updateOrderStatus, // Include status update functions
   updatePaymentStatus,
   updateDeliveryStatus,
+  getOrdersByEmail
+  
 } = require('../service/orderService'); // Import the service functions
 
 // Middleware for handling errors
