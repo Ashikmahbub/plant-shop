@@ -8,7 +8,8 @@ const createOrderRoutes = require("./routes/createOrderRoutes");
 const salesRoutes = require("./routes/salesRoutes");
 const manageOrderRoutes = require("./routes/manageOrdersRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
-const { connectToDatabase } = require("./config/dbConnection"); // Importing the dbConnection
+const { connectToDatabase } = require("./config/dbConnection");
+ 
 
 const app = express();
 
@@ -25,6 +26,8 @@ app.use("/api", createOrderRoutes);
 app.use("/api", salesRoutes);
 app.use("/api", manageOrderRoutes);
 app.use("/api", paymentRoutes);
+app.use("/api", require("./routes/chatRoutes"));
+
 // Serve static files from the 'uploads' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
