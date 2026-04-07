@@ -161,6 +161,17 @@ const Navbar = () => {
             >
               Contact
             </Link>
+
+            {/* PROFILE */}
+            {user && (
+              <Link
+                to="/profile"
+                className="block py-2 text-green-700 font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Profile
+              </Link>
+            )}
           </div>
           {/* DASHBOARD MOBILE */}
           {isAdmin && (
