@@ -1,8 +1,8 @@
-import React, { useState, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaSearch, FaShoppingCart } from 'react-icons/fa';
-import { useCart } from '../../context/CartContext'; // Assuming you have a useCart hook
-import { AuthContext } from '../../context/AuthContext';
+import React, { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaSearch, FaShoppingCart } from "react-icons/fa";
+import { useCart } from "../../context/CartContext"; // Assuming you have a useCart hook
+import { AuthContext } from "../../context/AuthContext";
 
 const Navbar = () => {
   const { cart } = useCart();
@@ -14,9 +14,9 @@ const Navbar = () => {
   const handleToggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-  const handleLogOut =()=>{
+  const handleLogOut = () => {
     return userSignOut();
-  }
+  };
 
   return (
     <nav className="bg-white shadow-md">
@@ -47,24 +47,38 @@ const Navbar = () => {
         </button>
 
         {/* Navbar Links */}
-        <ul className={`flex flex-col md:flex-row md:space-x-6 text-green-700 font-semibold md:items-center ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
+        <ul
+          className={`flex flex-col md:flex-row md:space-x-6 text-green-700 font-semibold md:items-center ${isMobileMenuOpen ? "block" : "hidden"}`}
+        >
           <li>
-            <Link to="/" className="block py-2 md:py-0 hover:text-green-900 transition duration-300">
+            <Link
+              to="/"
+              className="block py-2 md:py-0 hover:text-green-900 transition duration-300"
+            >
               Home
             </Link>
           </li>
           <li>
-            <Link to="/shop" className="block py-2 md:py-0 hover:text-green-900 transition duration-300">
+            <Link
+              to="/shop"
+              className="block py-2 md:py-0 hover:text-green-900 transition duration-300"
+            >
               Shop
             </Link>
           </li>
           <li>
-            <Link to="/about" className="block py-2 md:py-0 hover:text-green-900 transition duration-300">
+            <Link
+              to="/about"
+              className="block py-2 md:py-0 hover:text-green-900 transition duration-300"
+            >
               About Us
             </Link>
           </li>
           <li>
-            <Link to="/contact" className="block py-2 md:py-0 hover:text-green-900 transition duration-300">
+            <Link
+              to="/contact"
+              className="block py-2 md:py-0 hover:text-green-900 transition duration-300"
+            >
               Contact
             </Link>
           </li>
@@ -72,7 +86,10 @@ const Navbar = () => {
 
         {/* Profile Section */}
         <div className="flex items-center space-x-4">
-          <Link to="/cart" className="relative text-green-700 hover:text-green-900 transition duration-300 hidden md:flex items-center">
+          <Link
+            to="/cart"
+            className="relative text-green-700 hover:text-green-900 transition duration-300 hidden md:flex items-center"
+          >
             <FaShoppingCart size={24} />
             {cartItemCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -84,13 +101,22 @@ const Navbar = () => {
           {/* Check if user exists */}
           {user ? (
             <div className="flex items-center space-x-3">
-              <img
-                src={user.photoURL || '/default-avatar.png'} // Use Firebase user photoURL, fallback to default
-                alt="Profile"
-                className="w-8 h-8 rounded-full"
-              />
-              <span className="text-green-700">{user.displayName || 'Anonymous'}</span> {/* Use Firebase displayName */}
-              <Link to="/profile">{user.displayName || user.email}</Link>
+              <Link
+                to="/profile"
+                className="flex items-center space-x-2 hover:opacity-80 transition"
+              >
+                <img
+                  src={
+                    user.photoURL ||
+                    `https://ui-avatars.com/api/?name=${user.displayName || user.email}&background=166534&color=fff`
+                  }
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+                <span className="text-green-700 font-medium hidden md:block">
+                  {user.displayName || user.email}
+                </span>
+              </Link>
               <button
                 onClick={handleLogOut}
                 className="bg-green-700 text-white px-3 py-2 rounded hover:bg-green-800 transition duration-300"
