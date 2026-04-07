@@ -9,10 +9,17 @@ router.post("/chat", async (req, res) => {
   const { message, userEmail } = req.body;
 
   try {
+    const msg = (message || "").toLowerCase().trim();
+
     // =============================
-    // 🔹 INTENT: ORDER → NO AI CALL
+    // 🔹 SMART ORDER INTENT DETECTION
     // =============================
-    if (message.toLowerCase().includes("order")) {
+    if (
+      msg.includes("order") ||
+      msg.includes("track") ||
+      msg.includes("delivery") ||
+      msg.includes("status")
+    ) {
       if (!userEmail) {
         return res.json({
           reply: "Please login to check your orders 🌿",
@@ -21,29 +28,36 @@ router.post("/chat", async (req, res) => {
 
       const orders = await getOrdersByEmail(userEmail);
 
-      if (!orders.length) {
+      if (!orders || !orders.length) {
         return res.json({
           reply: "You have no orders yet.",
         });
       }
 
-      const latest = orders[0];
+      // 🔥 Ensure latest order (important)
+      const latest = orders.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      )[0];
+
       const isDelivered = latest.deliveryStatus === "Delivered";
+
       return res.json({
         type: "order",
         data: {
           id: latest._id,
           displayId: latest.orderCode,
 
-          items: latest.cart.map((item) => ({
+          items: (latest.cart || []).map((item) => ({
             title: item.title,
             quantity: item.quantity,
           })),
 
           status: latest.deliveryStatus,
           payment: latest.paymentStatus || "N/A",
-          total: latest.orderTotal,
-          date: new Date(latest.createdAt).toLocaleDateString(),
+          total: latest.orderTotal || 0,
+          date: latest.createdAt
+            ? new Date(latest.createdAt).toLocaleDateString()
+            : "",
 
           message: isDelivered
             ? "Thank you for shopping with us 🌿"
@@ -57,7 +71,7 @@ router.post("/chat", async (req, res) => {
     // =============================
     const products = await getAllProducts();
 
-    const safeProducts = products.slice(0, 20).map((p) => ({
+    const safeProducts = (products || []).slice(0, 20).map((p) => ({
       id: p._id,
       title: p.title,
       price: p.price,
@@ -67,6 +81,12 @@ router.post("/chat", async (req, res) => {
     // =============================
     // 🔹 AI CALL
     // =============================
+    if (!process.env.OPENAI_API_KEY) {
+      return res.json({
+        reply: "AI is not configured ❌",
+      });
+    }
+
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
@@ -99,15 +119,17 @@ ${JSON.stringify(safeProducts)}
           Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
           "Content-Type": "application/json",
         },
-      },
+      }
     );
 
-    res.json({
+    return res.json({
       reply: response.data.choices[0].message.content,
     });
+
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({
+    console.error("Chat Error:", err.message);
+
+    return res.status(500).json({
       reply: "Something went wrong 🌿",
     });
   }
