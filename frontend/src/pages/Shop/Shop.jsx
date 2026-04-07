@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { getProducts } from "../../services/api";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
-
- 
 
 const IMG_URL = process.env.REACT_APP_IMG_URL;
 
@@ -14,80 +11,63 @@ const Shop = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
-  const [products, setProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [sortOption, setSortOption] = useState("priceAsc");
+  const [sortOption, setSortOption] = useState("default");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch products when the component loads
     const fetchProducts = async () => {
       try {
         const data = await getProducts();
-        setProducts(data);
-
-        // Extract categories from the products
-        const allCategories = [
-          ...new Set(data.map((product) => product.category)),
-        ];
+        console.log("Fetched products:", data); // remove after confirming
+        setAllProducts(data);
+        const allCategories = [...new Set(data.map((p) => p.category).filter(Boolean))];
         setCategories(allCategories);
       } catch (error) {
         console.error("Error fetching products:", error);
+        toast.error("Failed to load products");
+      } finally {
+        setLoading(false);
       }
     };
-
     fetchProducts();
   }, []);
 
-  useEffect(() => {
-    // Sort and filter products when sortOption or selectedCategories changes
-    const fetchProducts = async () => {
-      try {
-        const data = await getProducts();
-        let filteredProducts = data;
+  const filteredProducts = useMemo(() => {
+    let result = [...allProducts];
 
-        if (selectedCategories.length > 0) {
-          filteredProducts = data.filter((product) =>
-            selectedCategories.includes(product.category.toLowerCase()),
-          );
-        }
+    if (selectedCategories.length > 0) {
+      result = result.filter((p) =>
+        selectedCategories.includes(p.category?.toLowerCase())
+      );
+    }
 
-        if (sortOption === "priceAsc") {
-          filteredProducts.sort((a, b) => a.price - b.price);
-        } else if (sortOption === "priceDesc") {
-          filteredProducts.sort((a, b) => b.price - a.price);
-        }
+    if (searchQuery.trim()) {
+      result = result.filter((p) =>
+        p.title?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
 
-        setProducts(filteredProducts);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
+    if (sortOption === "priceAsc") {
+      result.sort((a, b) => Number(a.price) - Number(b.price)); // ← cast to number
+    } else if (sortOption === "priceDesc") {
+      result.sort((a, b) => Number(b.price) - Number(a.price)); // ← cast to number
+    }
 
-    fetchProducts();
-  }, [selectedCategories, sortOption]);
+    return result;
+  }, [allProducts, selectedCategories, sortOption, searchQuery]);
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h2 className="text-3xl font-bold text-green-700 mb-6">
-        Shop Our Plants
-      </h2>
+      <h2 className="text-3xl font-bold text-green-700 mb-6">Shop Our Plants</h2>
 
       {/* Category Buttons */}
       <div className="mb-4 flex flex-wrap gap-2">
-        {[
-          "Indoor",
-          "Semi-indoor",
-          "Bonsai",
-          "Office Friendly",
-          "Flower",
-          "Outdoor",
-          "Fruits",
-        ].map((category) => (
-          <Link
-            to={`/${category.toLowerCase().replace(/ /g, "-")}`}
-            key={category}
-          >
+        {["Indoor", "Semi-indoor", "Bonsai", "Office Friendly", "Flower", "Outdoor", "Fruits"].map((category) => (
+          <Link to={`/${category.toLowerCase().replace(/ /g, "-")}`} key={category}>
             <button className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 transition duration-300">
               {category}
             </button>
@@ -103,6 +83,7 @@ const Shop = () => {
             onChange={(e) => setSortOption(e.target.value)}
             className="border border-gray-300 px-3 py-2 rounded"
           >
+            <option value="default">Default</option>
             <option value="priceAsc">Price: Low to High</option>
             <option value="priceDesc">Price: High to Low</option>
           </select>
@@ -118,7 +99,7 @@ const Shop = () => {
                     setSelectedCategories((prev) =>
                       e.target.checked
                         ? [...prev, value]
-                        : prev.filter((c) => c !== value),
+                        : prev.filter((c) => c !== value)
                     );
                   }}
                   className="form-checkbox"
@@ -132,13 +113,29 @@ const Shop = () => {
         <input
           type="text"
           placeholder="Search plants..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="border border-green-700 px-3 py-2 rounded w-full md:w-1/3"
         />
       </div>
 
+      {/* Loading */}
+      {loading && (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700" />
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!loading && filteredProducts.length === 0 && (
+        <div className="text-center py-20">
+          <p className="text-gray-500 text-xl">No products found.</p>
+        </div>
+      )}
+
       {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <div
             key={product._id}
             className="border border-gray-200 rounded-lg overflow-hidden shadow-sm"
@@ -164,13 +161,10 @@ const Shop = () => {
               <button
                 onClick={() => {
                   addToCart(product);
-                  toast.success(
-                    `${product.title} has been added to the cart!`,
-                    {
-                      position: "top-right",
-                      autoClose: 3000,
-                    },
-                  );
+                  toast.success(`${product.title} has been added to the cart!`, {
+                    position: "top-right",
+                    autoClose: 3000,
+                  });
                 }}
                 className="bg-green-700 text-white px-4 py-2 rounded mt-4 hover:bg-green-800 transition duration-300 w-full"
               >

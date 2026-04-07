@@ -5,7 +5,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getProductById } from '../../services/api';
 
-const API_URL = 'http://plants-shop.duckdns.org';
+const IMG_URL = process.env.REACT_APP_IMG_URL;
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -41,7 +41,7 @@ const ProductDetail = () => {
 
   const imageUrl = product.imageUrl?.startsWith('http')
     ? product.imageUrl
-    : `${API_URL}${product.imageUrl?.startsWith('/') ? '' : '/'}${product.imageUrl}`;
+    : `${IMG_URL}${product.imageUrl?.startsWith('/') ? '' : '/'}${product.imageUrl}`;
 
   return (
     <div className="container mx-auto px-4 py-10">
