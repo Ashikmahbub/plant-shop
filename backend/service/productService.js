@@ -1,93 +1,133 @@
-const { connectToDatabase } = require('../config/dbConnection');  
-const { ObjectId } = require('mongodb');  
-// Function to create a new product
+const { connectToDatabase } = require('../config/dbConnection');
+const { ObjectId } = require('mongodb');
+const redis = require('../config/redis');
+
+// ================== CREATE ==================
 async function createProduct(productData) {
   try {
     const db = await connectToDatabase();
     const productsCollection = db.collection('plants');
+
     await productsCollection.insertOne(productData);
+
+    // 🔥 CLEAR CACHE
+    await redis.del('plantshop:products');
+
     console.log("Product created successfully");
+
   } catch (error) {
     console.error('Error creating product:', error);
     throw new Error('Failed to create product');
   }
 }
 
-// Function to fetch all products
+// ================== GET ALL (WITH CACHE) ==================
 async function getAllProducts() {
   try {
+    const cache = await redis.get('plantshop:products');
+
+    if (cache) {
+      console.log("CACHE HIT");
+      return JSON.parse(cache);
+    }
+
     const db = await connectToDatabase();
     const productsCollection = db.collection('plants');
-    console.log("Retrieving products from the plants table");
-    return await productsCollection.find().toArray();
+
+    const products = await productsCollection.find().toArray();
+
+    // 🔥 STORE CACHE (2 minutes)
+    await redis.setEx('plantshop:products', 120, JSON.stringify(products));
+
+    console.log("DB HIT → cached");
+
+    return products;
+
   } catch (error) {
     console.error('Error fetching all products:', error);
     throw new Error('Failed to fetch products');
   }
 }
 
-// Function to fetch products by category
+// ================== CATEGORY ==================
 async function getProductsByCategory(category) {
   try {
-    console.log(`Fetching products for category: ${category}`);
     const db = await connectToDatabase();
     const productsCollection = db.collection('plants');
-    console.log(category);
-    
+
     return await productsCollection.find({ category }).toArray();
+
   } catch (error) {
     console.error('Error fetching products by category:', error);
     throw new Error('Failed to fetch products by category');
   }
 }
 
-// Function to update a product by ID
+// ================== UPDATE ==================
 async function updateProduct(id, updatedData) {
   try {
     const db = await connectToDatabase();
     const productsCollection = db.collection('plants');
+
     const result = await productsCollection.updateOne(
       { _id: new ObjectId(id) },
       { $set: updatedData }
     );
+
     if (result.matchedCount === 0) {
       throw new Error('Product not found');
     }
-    console.log(`Product with ID ${id} updated successfully`);
+
+    // 🔥 CLEAR CACHE
+    await redis.del('plantshop:products');
+
+    console.log(`Product updated`);
+
     return result;
+
   } catch (error) {
     console.error('Error updating product:', error);
     throw new Error('Failed to update product');
   }
 }
 
-// Function to delete a product by ID
+// ================== DELETE ==================
 async function deleteProduct(id) {
   try {
     const db = await connectToDatabase();
     const productsCollection = db.collection('plants');
-    const result = await productsCollection.deleteOne({ _id: new ObjectId(id) });
+
+    const result = await productsCollection.deleteOne({
+      _id: new ObjectId(id)
+    });
+
     if (result.deletedCount === 0) {
       throw new Error('Product not found');
     }
-    console.log(`Product with ID ${id} deleted successfully`);
+
+    // 🔥 CLEAR CACHE
+    await redis.del('plantshop:products');
+
+    console.log(`Product deleted`);
+
     return result;
+
   } catch (error) {
     console.error('Error deleting product:', error);
     throw new Error('Failed to delete product');
   }
 }
 
-// Function to fetch a product by ID
+// ================== GET ONE ==================
 async function getProductById(id) {
   try {
     const db = await connectToDatabase();
     const productsCollection = db.collection('plants');
-    const product = await productsCollection.findOne({ _id: new ObjectId(id) });
-    if (!product) {
-      throw new Error('Product not found');
-    }
-    return product;
+
+    return await productsCollection.findOne({
+      _id: new ObjectId(id)
+    });
+
   } catch (error) {
     console.error('Error fetching product by ID:', error);
     throw new Error('Failed to fetch product');

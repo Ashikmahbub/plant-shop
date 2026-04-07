@@ -1,3 +1,4 @@
+const redis = require('../config/redis');
 const express = require('express');
 const { 
   getAllProducts, 
@@ -13,10 +14,20 @@ const router = express.Router();
 // GET /api/products - Get all products
 router.get('/products', async (req, res) => {
   try {
+    const cache = await redis.get('plantshop:products');
+
+    if (cache) {
+      console.log('CACHE HIT');
+      return res.json(JSON.parse(cache));
+    }
+
     const products = await getAllProducts();
-    res.status(200).json(products);
+
+    await redis.setEx('plantshop:products', 120, JSON.stringify(products));
+
+    res.json(products);
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error(error);
     res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
