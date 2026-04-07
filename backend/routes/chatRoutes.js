@@ -30,7 +30,15 @@ router.post("/chat", async (req, res) => {
       const latest = orders[0];
 
       return res.json({
-        reply: `Your latest order (#${latest._id}) is "${latest.deliveryStatus}".`,
+        reply: `
+📦 Order Status
+
+🆔 Order ID: ${latest._id}
+🚚 Status: ${latest.deliveryStatus}
+💰 Total: ৳ ${latest.totalAmount}
+
+Thank you for shopping with us 🌿
+`,
       });
     }
 
