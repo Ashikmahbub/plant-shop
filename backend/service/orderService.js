@@ -117,6 +117,16 @@ async function deleteOrder(id) {
     throw error;
   }
 }
+async function getOrdersByEmail(email) {
+  try {
+    const db = await connectToDatabase();
+    const collection = db.collection('orders');
+    return await collection.find({ email }).toArray();
+  } catch (error) {
+    console.error('Error fetching orders by email:', error);
+    throw error;
+  }
+}
 
 module.exports = {
   createOrder,
@@ -125,5 +135,6 @@ module.exports = {
   updateOrder,
   deleteOrder,
   updatePaymentStatus,
-  updateDeliveryStatus
+  updateDeliveryStatus,
+  getOrdersByEmail ,
 };

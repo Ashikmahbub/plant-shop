@@ -90,6 +90,7 @@ const Navbar = () => {
                 className="w-8 h-8 rounded-full"
               />
               <span className="text-green-700">{user.displayName || 'Anonymous'}</span> {/* Use Firebase displayName */}
+              <Link to="/profile">{user.displayName || user.email}</Link>
               <button
                 onClick={handleLogOut}
                 className="bg-green-700 text-white px-3 py-2 rounded hover:bg-green-800 transition duration-300"

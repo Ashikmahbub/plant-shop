@@ -27,6 +27,7 @@ import ThankYou         from "../pages/Checkout/ThankYou";
 // ── Auth ───────────────────────────────
 import LoginForm        from "../components/forms/LoginForm";
 import SignUpForm       from "../components/forms/SignUpForm";
+import UserProfile from "../pages/User/UserProfile";
 
 // ── Admin (FIXED CASE) ─────────────────
 import Dashboard        from "../pages/admin/dashboard/Dashboard";
@@ -62,6 +63,7 @@ export const router = createBrowserRouter([
       { path: "signup",             element: <SignUpForm /> },
       { path: "product/:id", element: <ProductDetail /> },
       { path: "product/:id", element: <ProductDetail /> },
+      { path: "profile", element: <UserProfile /> },
 
      {
   path: "admin",
