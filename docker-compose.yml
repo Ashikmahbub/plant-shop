@@ -1,8 +1,12 @@
 version: "3.8"
 
 services:
+  plants-redis:
+    image: redis:7
+    container_name: plants_redis
+    restart: always
+
   plants-backend:
-    
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -13,7 +17,9 @@ services:
     env_file:
       - ./backend/.env
     volumes:
-      - ./backend/uploads:/app/uploads 
+      - ./backend/uploads:/app/uploads
+    depends_on:
+      - plants-redis
 
   plants-frontend:
     build:
