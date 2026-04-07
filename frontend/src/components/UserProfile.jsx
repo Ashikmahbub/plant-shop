@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../services/firebase';
+import { AuthContext } from '../context/AuthContext';
 import { getOrdersByEmail } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
