@@ -15,7 +15,7 @@ const Navbar = () => {
   const [search, setSearch] = useState("");
 
   // ✅ ADMIN CHECK
-  const isAdmin = user?.email === "admin@plantshop.bd";  
+  const isAdmin = user?.email === "admin@email.com"; // replace this
 
   const handleSearchSubmit = () => {
     if (!search.trim()) return;
@@ -25,7 +25,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white shadow-md relative z-50">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+      <div className="w-full px-4 py-3 flex items-center justify-between">
 
         {/* LEFT */}
         <div className="flex items-center gap-3">
@@ -59,15 +59,15 @@ const Navbar = () => {
         </div>
 
         {/* RIGHT */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
 
-          {/* ✅ ADMIN BUTTON */}
+          {/* DASHBOARD BUTTON */}
           {isAdmin && (
             <button
               onClick={() => navigate("/admin")}
-              className="bg-green-700 text-white px-3 py-1 rounded hover:bg-green-800 transition"
+              className="bg-green-700 text-white px-3 py-1 rounded hover:bg-green-800 transition text-sm"
             >
-              Admin
+              Dashboard
             </button>
           )}
 
@@ -84,14 +84,37 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* AUTH */}
+          {/* PROFILE / AUTH */}
           {user ? (
-            <button
-              onClick={userSignOut}
-              className="bg-green-700 text-white px-3 py-1 rounded hover:bg-green-800 transition"
-            >
-              Logout
-            </button>
+            <div className="flex items-center space-x-2">
+
+              {/* PROFILE */}
+              <Link
+                to="/profile"
+                className="flex items-center space-x-2 hover:opacity-80"
+              >
+                <img
+                  src={
+                    user.photoURL ||
+                    `https://ui-avatars.com/api/?name=${user.displayName || user.email}&background=166534&color=fff`
+                  }
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+                <span className="hidden md:block text-green-700 font-medium text-sm">
+                  {user.displayName || user.email}
+                </span>
+              </Link>
+
+              {/* LOGOUT */}
+              <button
+                onClick={userSignOut}
+                className="bg-green-700 text-white px-2 py-1 rounded text-sm"
+              >
+                Logout
+              </button>
+
+            </div>
           ) : (
             <Link to="/login" className="text-green-700 font-medium">
               Login
@@ -125,7 +148,7 @@ const Navbar = () => {
           <Link to="/shop" onClick={() => setIsMobileMenuOpen(false)}>Shop</Link>
           <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
 
-          {/* ADMIN (MOBILE) */}
+          {/* DASHBOARD MOBILE */}
           {isAdmin && (
             <button
               onClick={() => {
@@ -134,7 +157,7 @@ const Navbar = () => {
               }}
               className="block w-full text-left text-green-700 font-semibold"
             >
-              Admin
+              Dashboard
             </button>
           )}
 
