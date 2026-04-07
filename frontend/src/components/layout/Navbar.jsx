@@ -26,7 +26,6 @@ const Navbar = () => {
   return (
     <nav className="bg-white shadow-md relative z-50">
       <div className="w-full px-4 py-3 flex items-center justify-between">
-
         {/* LEFT */}
         <div className="flex items-center gap-3">
           <button
@@ -60,7 +59,6 @@ const Navbar = () => {
 
         {/* RIGHT */}
         <div className="flex items-center gap-3">
-
           {/* DASHBOARD BUTTON */}
           {isAdmin && (
             <button
@@ -87,7 +85,6 @@ const Navbar = () => {
           {/* PROFILE / AUTH */}
           {user ? (
             <div className="flex items-center space-x-2">
-
               {/* PROFILE */}
               <Link
                 to="/profile"
@@ -113,7 +110,6 @@ const Navbar = () => {
               >
                 Logout
               </button>
-
             </div>
           ) : (
             <Link to="/login" className="text-green-700 font-medium">
@@ -126,7 +122,6 @@ const Navbar = () => {
       {/* MOBILE MENU */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-t px-4 pb-4 space-y-3">
-
           {/* SEARCH */}
           <div className="flex">
             <input
@@ -144,10 +139,29 @@ const Navbar = () => {
           </div>
 
           {/* LINKS */}
-          <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-          <Link to="/shop" onClick={() => setIsMobileMenuOpen(false)}>Shop</Link>
-          <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
-
+          <div className="flex flex-col space-y-2">
+            <Link
+              to="/"
+              className="block py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              to="/shop"
+              className="block py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Shop
+            </Link>
+            <Link
+              to="/contact"
+              className="block py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
+          </div>
           {/* DASHBOARD MOBILE */}
           {isAdmin && (
             <button
@@ -160,7 +174,6 @@ const Navbar = () => {
               Dashboard
             </button>
           )}
-
         </div>
       )}
     </nav>
