@@ -1,129 +1,126 @@
-const express = require('express');
-const multer = require('multer');
-const {
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  getAllProducts,
-  getProductById
-} = require('../service/productService');
-const router = express.Router();
+import axios from 'axios';
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  },
-});
+const API_URL = 'http://plants-shop.duckdns.org/api';
 
-const upload = multer({ storage: storage });
-
-// POST /api/admin/products - Add a product
-router.post('/admin/products', upload.single('image'), async (req, res) => {
-  const { title, category, weight, price, description } = req.body;
-  const lowerCaseCategory = category.toLowerCase();
-  const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
-
+// Products API
+export const getProducts = async () => {
   try {
-    const productData = {
-      title,
-      category: lowerCaseCategory,
-      weight,
-      price,
-      description,
-      imageUrl
-    };
-
-    await createProduct(productData);
-    res.status(201).json({ message: 'Product added successfully!' });
+    const response = await axios.get(`${API_URL}/products?t=${Date.now()}`);
+    return response.data;
   } catch (error) {
-    console.error('Error adding product:', error);
-    res.status(500).json({ error: 'Failed to add product' });
+    console.error('Error fetching products:', error);
+    throw error;
   }
-});
+};
 
-// PUT /api/admin/products/:id - Update a product
-router.put('/admin/products/:id', upload.single('image'), async (req, res) => {
-  const { id } = req.params;
-  const { title, category, weight, price, description } = req.body;
-  const lowerCaseCategory = category.toLowerCase();
-
+export const getProductById = async (id) => {
   try {
-    const product = await getProductById(id);
-
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : product.imageUrl;
-
-    const updatedData = {
-      title,
-      category: lowerCaseCategory,
-      weight,
-      price,
-      description,
-      imageUrl,
-    };
-
-    const result = await updateProduct(id, updatedData);
-
-    if (result.modifiedCount > 0) {
-      res.status(200).json({ message: 'Product updated successfully!' });
-    } else {
-      res.status(404).json({ message: 'Product not found or no changes made' });
-    }
+    const response = await axios.get(`${API_URL}/products/${id}?t=${Date.now()}`);
+    return response.data;
   } catch (error) {
-    console.error('Error updating product:', error);
-    res.status(500).json({ error: 'Failed to update product' });
+    console.error(`Error fetching product with ID ${id}:`, error);
+    throw error;
   }
-});
+};
 
-// DELETE /api/admin/products/:id - Delete a product
-router.delete('/admin/products/:id', async (req, res) => {
-  const { id } = req.params;
-
+export const createProduct = async (productData) => {
   try {
-    const result = await deleteProduct(id);
-
-    if (result.deletedCount > 0) {
-      res.status(200).json({ message: 'Product deleted successfully!' });
-    } else {
-      res.status(404).json({ message: 'Product not found' });
-    }
+    const response = await axios.post(`${API_URL}/products`, productData);
+    console.log('Product created:', response.data);
   } catch (error) {
-    console.error('Error deleting product:', error);
-    res.status(500).json({ error: 'Failed to delete product' });
+    console.error('Error creating product:', error);
   }
-});
+};
 
-// GET /api/admin/products - Get all products
-router.get('/admin/products', async (req, res) => {
+export const updateProduct = async (id, productData) => {
   try {
-    const products = await getAllProducts();
-    res.status(200).json(products);
+    const response = await axios.put(`${API_URL}/products/${id}`, productData);
+    return response.data;
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch products' });
+    console.error(`Error updating product with ID ${id}:`, error);
+    throw error;
   }
-});
+};
 
-// GET /api/admin/products/:id - Get a product by ID
-router.get('/admin/products/:id', async (req, res) => {
-  const { id } = req.params;
-
+export const deleteProduct = async (id) => {
   try {
-    const product = await getProductById(id);
-
-    if (product) {
-      res.status(200).json(product);
-    } else {
-      res.status(404).json({ message: 'Product not found' });
-    }
+    const response = await axios.delete(`${API_URL}/products/${id}`);
+    return response.data;
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch product' });
+    console.error(`Error deleting product with ID ${id}:`, error);
+    throw error;
   }
-});
+};
 
-module.exports = router;
+// Orders API
+export const createOrder = async (orderData) => {
+  try {
+    const response = await axios.post(`${API_URL}/orders`, orderData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating order:', error);
+    throw error;
+  }
+};
+
+export const getOrders = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/orders`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    throw error;
+  }
+};
+
+export const getOrderById = async (id) => {
+  try {
+    const response = await axios.get(`${API_URL}/orders/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching order with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+export const updateOrderStatus = async (id, status) => {
+  try {
+    const response = await axios.put(`${API_URL}/orders/${id}`, { status });
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating order status with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+// Admin Authentication API
+export const adminLogin = async (credentials) => {
+  try {
+    const response = await axios.post(`${API_URL}/admin/login`, credentials);
+    return response.data;
+  } catch (error) {
+    console.error('Error logging in as admin:', error);
+    throw error;
+  }
+};
+
+export const adminLogout = async () => {
+  try {
+    const response = await axios.post(`${API_URL}/admin/logout`);
+    return response.data;
+  } catch (error) {
+    console.error('Error logging out as admin:', error);
+    throw error;
+  }
+};
+
+// Sales Summary API
+export const getSalesSummary = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/sales-summary`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching sales summary:', error);
+    throw error;
+  }
+};
