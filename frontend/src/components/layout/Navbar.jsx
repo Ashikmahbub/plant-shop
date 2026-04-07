@@ -10,9 +10,18 @@ const Navbar = () => {
   const navigate = useNavigate();
   const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [search, setSearch] = useState("");
 
   const handleToggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
+  const handleSearchSubmit = () => {
+    if (!search.trim()) return;
+
+    navigate(`/shop?search=${encodeURIComponent(search)}`);
   };
   const handleLogOut = () => {
     return userSignOut();
@@ -30,10 +39,17 @@ const Navbar = () => {
         <div className="relative hidden md:flex md:w-1/3">
           <input
             type="text"
+            value={search}
+            onChange={handleSearchChange}
+            onKeyDown={(e) => e.key === "Enter" && handleSearchSubmit()}
             placeholder="Search plants..."
             className="border border-green-700 px-4 py-2 rounded-l w-full focus:outline-none"
           />
-          <button className="absolute inset-y-0 right-0 px-4 py-2 bg-green-700 text-white rounded-r hover:bg-green-800 transition duration-300 flex items-center">
+
+          <button
+            onClick={handleSearchSubmit}
+            className="absolute inset-y-0 right-0 px-4 py-2 bg-green-700 text-white rounded-r hover:bg-green-800 transition duration-300 flex items-center"
+          >
             <FaSearch />
           </button>
         </div>
