@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState, useContext } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
 
 const ChatBotWidget = () => {
@@ -8,23 +8,50 @@ const ChatBotWidget = () => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
+
+  const messagesEndRef = useRef(null);
+
+  // ✅ auto scroll
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isTyping]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
 
     const userMsg = { role: "user", text: input };
+
+    // ✅ show instantly
     setMessages((prev) => [...prev, userMsg]);
+
+    // ✅ clear input instantly
+    setInput("");
+
+    // ✅ typing indicator ON
+    setIsTyping(true);
 
     try {
       const res = await axios.post("/api/chat", {
-        message: input,
-        userEmail: user?.email, // ✅ important
+        message: userMsg.text,
+        userEmail: user?.email,
       });
 
-      const botMsg = {
-        role: "bot",
-        text: res.data.reply,
-      };
+      let botMsg;
+
+      // ✅ order card support
+      if (res.data.type === "order") {
+        botMsg = {
+          role: "bot",
+          type: "order",
+          data: res.data.data,
+        };
+      } else {
+        botMsg = {
+          role: "bot",
+          text: res.data.reply,
+        };
+      }
 
       setMessages((prev) => [...prev, botMsg]);
 
@@ -33,9 +60,10 @@ const ChatBotWidget = () => {
         ...prev,
         { role: "bot", text: "Something went wrong 🌿" },
       ]);
+    } finally {
+      // ✅ typing indicator OFF
+      setIsTyping(false);
     }
-
-    setInput("");
   };
 
   return (
@@ -68,18 +96,62 @@ const ChatBotWidget = () => {
                   m.role === "user" ? "justify-end" : "justify-start"
                 }`}
               >
-                <div
-                  className={`px-3 py-2 rounded-lg max-w-[75%] text-sm ${
-                    m.role === "user"
-                      ? "bg-green-700 text-white"
-                      : "bg-white border border-green-200 text-gray-700"
-                  }`}
-                >
-                  {m.text}
-                </div>
+                {m.type === "order" ? (
+                  <div className="bg-white border border-green-200 rounded-lg p-3 text-sm w-full max-w-[85%]">
+
+                    <div className="font-semibold text-green-700 mb-1">
+                      #{m.data.displayId}
+                    </div>
+
+                    {m.data.items.map((item, idx) => (
+                      <div key={idx} className="text-gray-600">
+                        {item.title} × {item.quantity}
+                      </div>
+                    ))}
+
+                    <div className="flex justify-between mt-2 text-xs">
+                      <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded">
+                        {m.data.status}
+                      </span>
+                      <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                        {m.data.payment}
+                      </span>
+                    </div>
+
+                    <div className="text-right font-semibold text-green-700 mt-2">
+                      ৳ {m.data.total}
+                    </div>
+
+                    {m.data.message && (
+                      <div className="text-xs text-gray-500 mt-2">
+                        {m.data.message}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div
+                    className={`px-3 py-2 rounded-lg max-w-[75%] text-sm ${
+                      m.role === "user"
+                        ? "bg-green-700 text-white"
+                        : "bg-white border border-green-200 text-gray-700"
+                    }`}
+                  >
+                    {m.text}
+                  </div>
+                )}
               </div>
             ))}
 
+            {/* ✅ AI typing indicator */}
+            {isTyping && (
+              <div className="flex justify-start">
+                <div className="bg-white border border-green-200 px-3 py-2 rounded-lg text-sm text-gray-500 animate-pulse">
+                  🌿 AI is typing...
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
           </div>
 
           {/* INPUT */}
