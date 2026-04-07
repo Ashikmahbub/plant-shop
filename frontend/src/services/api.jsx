@@ -127,7 +127,7 @@ export const getSalesSummary = async () => {
 export const getOrdersByEmail = async (email) => {
   try {
     const response = await axios.get(
-      `${API_URL}/api/orders/by-email?email=${encodeURIComponent(email)}`
+      `${API_URL}/orders/by-email?email=${encodeURIComponent(email)}`
     );
 
     return response.data;
