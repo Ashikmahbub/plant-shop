@@ -4,11 +4,43 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
- 
 
 const API_URL = "http://plants-shop.duckdns.org/api/";
 const IMG_URL = process.env.REACT_APP_IMG_URL;
-const SHIPPING_CHARGE = 60; // BDT
+const SHIPPING_CHARGE = 60;
+
+// Payment method logos using brand colors as SVG badges
+const PaymentLogos = () => (
+  <div className="flex flex-wrap items-center gap-2 mt-3">
+    {/* bKash */}
+    <span className="flex items-center gap-1 bg-pink-600 text-white text-xs font-bold px-2 py-1 rounded-md">
+      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="10"/></svg>
+      bKash
+    </span>
+    {/* Nagad */}
+    <span className="flex items-center gap-1 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-md">
+      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="10"/></svg>
+      Nagad
+    </span>
+    {/* Rocket */}
+    <span className="flex items-center gap-1 bg-purple-700 text-white text-xs font-bold px-2 py-1 rounded-md">
+      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="10"/></svg>
+      Rocket
+    </span>
+    {/* VISA */}
+    <span className="flex items-center gap-1 bg-blue-700 text-white text-xs font-bold px-2 py-1 rounded-md">
+      VISA
+    </span>
+    {/* Mastercard */}
+    <span className="flex items-center gap-1 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-md">
+      MC
+    </span>
+    {/* Bank */}
+    <span className="flex items-center gap-1 bg-gray-700 text-white text-xs font-bold px-2 py-1 rounded-md">
+      🏦 Bank
+    </span>
+  </div>
+);
 
 const OrderSummary = () => {
   const { cart, clearCart } = useCart();
@@ -16,10 +48,10 @@ const OrderSummary = () => {
   const navigate = useNavigate();
   const { name, email, phone, address, city, country } = location.state || {};
   const [isLoading, setIsLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState(''); // 'cod' or 'sslcommerz'
+  const [paymentMethod, setPaymentMethod] = useState('');
 
   const getTotalPrice = () =>
-    cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    cart.reduce((total, item) => total + Number(item.price) * item.quantity, 0);
 
   const getTotalWithShipping = () =>
     (getTotalPrice() + SHIPPING_CHARGE).toFixed(2);
@@ -29,7 +61,6 @@ const OrderSummary = () => {
     return null;
   }
 
-  // ── COD Handler ───────────────────────────────────────────
   const handleCOD = async () => {
     setIsLoading(true);
     try {
@@ -40,17 +71,15 @@ const OrderSummary = () => {
         shippingCharge: SHIPPING_CHARGE,
         totalAmount: getTotalWithShipping(),
       });
-
       toast.success("Order placed successfully!");
       clearCart();
-       navigate(`/thank-you/${response.data.orderCode}`, { state: { paymentMethod: 'COD' } });
+      navigate(`/thank-you/${response.data.orderCode}`, { state: { paymentMethod: 'COD' } });
     } catch (error) {
       toast.error("Failed to place order.");
       setIsLoading(false);
     }
   };
 
-  // ── SSLCommerz Handler ────────────────────────────────────
   const handleSSLCommerz = async () => {
     setIsLoading(true);
     try {
@@ -61,8 +90,6 @@ const OrderSummary = () => {
         shippingCharge: SHIPPING_CHARGE,
         totalAmount: getTotalWithShipping(),
       });
-
-      // SSLCommerz returns a payment URL — redirect to it
       if (response.data.paymentUrl) {
         window.location.href = response.data.paymentUrl;
       } else {
@@ -112,7 +139,7 @@ const OrderSummary = () => {
                 <div className="flex items-center gap-4">
                   <span className="text-gray-600">Qty: {item.quantity}</span>
                   <span className="font-bold text-gray-800">
-                    ৳ {(item.price * item.quantity).toFixed(2)}
+                    ৳ {(Number(item.price) * item.quantity).toFixed(2)}
                   </span>
                 </div>
               </li>
@@ -152,7 +179,7 @@ const OrderSummary = () => {
             }`}
           >
             <div className="flex items-center gap-3">
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+              <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
                 paymentMethod === 'cod' ? 'border-green-600' : 'border-gray-400'
               }`}>
                 {paymentMethod === 'cod' && (
@@ -162,6 +189,10 @@ const OrderSummary = () => {
               <div>
                 <p className="font-semibold text-gray-800">Cash on Delivery</p>
                 <p className="text-sm text-gray-500">Pay when your order arrives</p>
+                <div className="flex items-center gap-1 mt-2">
+                  <span className="text-2xl">💵</span>
+                  <span className="text-xs text-gray-400">Pay at doorstep</span>
+                </div>
               </div>
             </div>
           </div>
@@ -176,16 +207,17 @@ const OrderSummary = () => {
             }`}
           >
             <div className="flex items-center gap-3">
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+              <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
                 paymentMethod === 'sslcommerz' ? 'border-green-600' : 'border-gray-400'
               }`}>
                 {paymentMethod === 'sslcommerz' && (
                   <div className="w-3 h-3 rounded-full bg-green-600" />
                 )}
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="font-semibold text-gray-800">SSLCommerz</p>
                 <p className="text-sm text-gray-500">Pay with bKash, card, bank & more</p>
+                <PaymentLogos />
               </div>
             </div>
           </div>
