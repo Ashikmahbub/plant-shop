@@ -23,7 +23,7 @@ const FloatingButtons = () => {
 
       {/* Search Input Popup */}
       {showSearch && (
-        <div className="fixed bottom-28 right-4 z-50 flex items-center bg-white rounded-full shadow-xl border border-gray-200 overflow-hidden">
+        <div className="fixed bottom-52 right-4 z-50 flex items-center bg-white rounded-full shadow-xl border border-gray-200 overflow-hidden">
           <input
             autoFocus
             value={search}
@@ -44,7 +44,7 @@ const FloatingButtons = () => {
       {/* Floating Search Button */}
       <div
         onClick={() => setShowSearch(!showSearch)}
-        className="fixed bottom-24 right-6 z-50 bg-white border-2 border-green-700 text-green-700 w-12 h-12 rounded-full shadow-lg flex items-center justify-center cursor-pointer hover:bg-green-50 transition"
+        className="fixed bottom-48 right-6 z-50 bg-white border-2 border-green-700 text-green-700 w-12 h-12 rounded-full shadow-lg flex items-center justify-center cursor-pointer hover:bg-green-50 transition"
       >
         <FaSearch size={18} />
       </div>
@@ -52,7 +52,7 @@ const FloatingButtons = () => {
       {/* Floating Cart Button */}
       <div
         onClick={() => navigate('/cart')}
-        className="fixed bottom-6 right-6 z-50 bg-green-700 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center cursor-pointer hover:bg-green-800 transition"
+        className="fixed bottom-36 right-6 z-50 bg-green-700 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center cursor-pointer hover:bg-green-800 transition"
       >
         <FaShoppingCart size={22} />
         {cartItemCount > 0 && (

@@ -17,6 +17,20 @@ const ChatBotWidget = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
+  useEffect(() => {
+    if (sessionStorage.getItem("greeted")) return;
+    const timer = setTimeout(() => {
+      setOpen(true);
+      setMessages([
+        {
+          role: "bot",
+          text: "👋 Hi! I'm your Plant Assistant. How can I help you today? 🌿",
+        },
+      ]);
+      sessionStorage.setItem("greeted", "true");
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -54,7 +68,6 @@ const ChatBotWidget = () => {
       }
 
       setMessages((prev) => [...prev, botMsg]);
-
     } catch (error) {
       setMessages((prev) => [
         ...prev,
@@ -67,8 +80,7 @@ const ChatBotWidget = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-
+    <div className="fixed bottom-36 right-4 z-50">
       {/* FLOAT BUTTON */}
       <button
         onClick={() => setOpen(!open)}
@@ -80,7 +92,6 @@ const ChatBotWidget = () => {
       {/* CHAT BOX */}
       {open && (
         <div className="w-[90vw] sm:w-80 h-[70vh] sm:h-96 bg-white rounded-xl shadow-2xl mt-3 flex flex-col overflow-hidden border border-green-200">
-
           {/* HEADER */}
           <div className="bg-green-700 text-white p-3 font-semibold text-center">
             🌿 Plant Assistant
@@ -88,7 +99,6 @@ const ChatBotWidget = () => {
 
           {/* MESSAGES */}
           <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-green-50">
-
             {messages.map((m, i) => (
               <div
                 key={i}
@@ -98,7 +108,6 @@ const ChatBotWidget = () => {
               >
                 {m.type === "order" ? (
                   <div className="bg-white border border-green-200 rounded-lg p-3 text-sm w-full max-w-[85%]">
-
                     <div className="font-semibold text-green-700 mb-1">
                       #{m.data.displayId}
                     </div>
@@ -170,7 +179,6 @@ const ChatBotWidget = () => {
               Send
             </button>
           </div>
-
         </div>
       )}
     </div>
